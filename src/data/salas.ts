@@ -1,17 +1,34 @@
 // Contenido curatorial de cada sala. Fuente: Dossier curatorial "Del fuego al lienzo".
 // Para agregar una sala nueva basta con sumar un objeto a este arreglo.
 
-/** Coordenadas en píxeles de la imagen (origen arriba a la izquierda). */
-export type Imagen = {
-  src: string
-  prof: string // mapa de profundidad en escala de grises (blanco = cerca)
+/**
+ * Cada escena es un render de Gemini partido en capas (fondo, pedestal, atril...).
+ * Cada capa lleva un mapa de profundidad (blanco = cerca) con el que se levanta en 3D.
+ * Los puntos se dan en píxeles del render y con su cercanía `n` (0 lejos, 1 cerca).
+ */
+export type Capa = { src: string; prof: string; caja?: [number, number, number, number]; malla?: [number, number] }
+export type Escena = {
   ancho: number
   alto: number
-  fuego?: [number, number, number, number] // centro y radios del resplandor
-  humo?: [number, number] // origen de la columna de humo
+  fov: number // campo de visión vertical estimado del render
+  escala: number // distancia (m) de un punto con cercanía 1
+  capas: Capa[]
+  fuego?: [number, number, number, number] // resplandor de la brasa (centro y radios, px)
+  humo?: [number, number, number] // origen del humo (px y cercanía)
 }
-export type Vista = { id: string; nombre: string; img: number; x: number; y: number; zoom: number; nota?: string }
-export type Punto = { id: string; img: number; x: number; y: number; etiqueta: string; accion: 'vista' | 'ficha' | 'audio' | 'siguiente'; vista?: string }
+export type P3 = [number, number, number] // x, y en píxeles del render y cercanía n
+export type Vista = {
+  id: string
+  nombre: string
+  escena: string
+  pos: [number, number, number] // posición de la cámara en metros
+  mira: P3
+  fov?: number
+  libertad?: number // cuánto se mueve la cámara con el cursor
+  nota?: string
+}
+export type Punto = { id: string; escena: string; en: P3; etiqueta: string; accion: 'vista' | 'audio'; vista?: string }
+export type Elemento = { en: P3; texto: string; lado: 'izq' | 'der' }
 
 export type Sala = {
   numero: number
@@ -29,10 +46,16 @@ export type Sala = {
   audio: string | null
   imagenes: { src: string; pie: string }[]
   siguiente?: string
-  /** Renders que forman la sala y tomas de cámara sobre ellos. */
-  escena: Imagen[]
+  /** Escenas, tomas de cámara y puntos interactivos */
+  escenas: Record<string, Escena>
   vistas: Vista[]
   puntos: Punto[]
+  /** Paneles flotantes junto a la obra: anclados a puntos de la sala */
+  paneles: { vista: string; izq: P3; der: P3 }
+  /** Elementos del platillo señalados en la vista de cerca */
+  elementos: Elemento[]
+  /** Claves de composición que flotan en la vista de cerca */
+  claves: { titulo: string; texto: string }[]
   /** Cambios de toma durante el recorrido guiado: frase del guion donde empieza cada toma. */
   guia: { frase: string; vista: string }[]
 }
@@ -65,24 +88,54 @@ export const salas: Sala[] = [
       { src: 'salas/01/espacio.webp', pie: 'Concepto espacial de la sala. Imagen generada con Gemini.' },
     ],
     siguiente: 'Mesopotamia',
-    escena: [
-      { src: 'salas/01/espacio.webp', prof: 'salas/01/espacio-prof.png', ancho: 1376, alto: 768, fuego: [682, 462, 170, 34], humo: [700, 405] },
-      { src: 'salas/01/platillo.webp', prof: 'salas/01/platillo-prof.png', ancho: 1376, alto: 768, fuego: [560, 150, 300, 140] },
-    ],
+    escenas: {
+      sala: {
+        ancho: 1376, alto: 768, fov: 50, escala: 3.2,
+        capas: [
+          { src: 'salas/01/sala-fondo.webp', prof: 'salas/01/sala-fondo-prof.png', caja: [-0.1, -0.1, 1.1, 1.1], malla: [300, 180] },
+          { src: 'salas/01/sala-pedestal.webp', prof: 'salas/01/sala-pedestal-prof.png', caja: [0.34, 0.51, 0.65, 0.89], malla: [140, 110] },
+          { src: 'salas/01/sala-atril.webp', prof: 'salas/01/sala-atril-prof.png', caja: [0.58, 0.64, 0.67, 0.93], malla: [40, 80] },
+        ],
+        fuego: [682, 462, 170, 34],
+        humo: [700, 405, 0.75],
+      },
+      platillo: {
+        ancho: 1376, alto: 768, fov: 46, escala: 1.0,
+        capas: [
+          { src: 'salas/01/platillo-fondo.webp', prof: 'salas/01/platillo-fondo-prof.png', caja: [-0.1, -0.1, 1.1, 1.1], malla: [200, 120] },
+          { src: 'salas/01/platillo-plato.webp', prof: 'salas/01/platillo-plato-prof.png', caja: [0.09, 0.38, 0.95, 0.97], malla: [220, 130] },
+        ],
+        fuego: [560, 150, 300, 140],
+      },
+    },
     vistas: [
-      { id: 'sala', nombre: 'La sala', img: 0, x: 688, y: 384, zoom: 1 },
-      { id: 'obra', nombre: 'La obra', img: 0, x: 680, y: 450, zoom: 1.9 },
-      { id: 'platillo', nombre: 'El platillo', img: 1, x: 688, y: 430, zoom: 1.15 },
-      { id: 'pinturas', nombre: 'Pinturas', img: 0, x: 250, y: 290, zoom: 1.6, nota: 'La paleta de la obra sale de estos muros: ocre, rojo de hierro y negro de carbón.' },
-      { id: 'atril', nombre: 'Atril', img: 0, x: 858, y: 545, zoom: 2.2 },
-      { id: 'arco', nombre: 'Siguiente sala', img: 0, x: 922, y: 330, zoom: 1.9, nota: 'Por este arco se pasa a la Sala 2, Mesopotamia. Próximamente.' },
+      { id: 'sala', nombre: 'La sala', escena: 'sala', pos: [0, 0, 0], mira: [688, 400, 0.3], fov: 42 },
+      { id: 'obra', nombre: 'La obra', escena: 'sala', pos: [0.05, 0.45, -1.55], mira: [690, 448, 0.74], fov: 46, libertad: 0.6 },
+      { id: 'platillo', nombre: 'El platillo', escena: 'platillo', pos: [0, 0.2, -0.1], mira: [690, 430, 0.84], fov: 46, libertad: 0.5 },
+      { id: 'pinturas', nombre: 'Pinturas', escena: 'sala', pos: [-0.35, 0.05, -0.9], mira: [390, 300, 0.48], fov: 40, libertad: 0.7, nota: 'La paleta de la obra sale de estos muros: ocre, rojo de hierro y negro de carbón.' },
+      { id: 'atril', nombre: 'Atril', escena: 'sala', pos: [0.45, 0.1, -1.3], mira: [858, 540, 0.86], fov: 40 },
+      { id: 'arco', nombre: 'Siguiente sala', escena: 'sala', pos: [0.55, 0, -1.6], mira: [922, 330, 0.38], fov: 40, nota: 'Por este arco se pasa a la Sala 2, Mesopotamia. Próximamente.' },
     ],
     puntos: [
-      { id: 'obra', img: 0, x: 692, y: 425, etiqueta: 'Brasa primigenia', accion: 'vista', vista: 'platillo' },
-      { id: 'atril', img: 0, x: 858, y: 620, etiqueta: 'Audioguía', accion: 'audio' },
-      { id: 'pinturas', img: 0, x: 175, y: 250, etiqueta: 'Pinturas rupestres', accion: 'vista', vista: 'pinturas' },
-      { id: 'arco', img: 0, x: 922, y: 300, etiqueta: 'Sala 2 · Mesopotamia', accion: 'vista', vista: 'arco' },
-      { id: 'ficha', img: 1, x: 700, y: 360, etiqueta: 'Ver ficha de la obra', accion: 'ficha' },
+      { id: 'obra', escena: 'sala', en: [700, 418, 0.75], etiqueta: 'Brasa primigenia', accion: 'vista', vista: 'obra' },
+      { id: 'atril', escena: 'sala', en: [858, 610, 0.86], etiqueta: 'Audioguía', accion: 'audio' },
+      { id: 'pinturas', escena: 'sala', en: [175, 250, 0.6], etiqueta: 'Pinturas rupestres', accion: 'vista', vista: 'pinturas' },
+      { id: 'arco', escena: 'sala', en: [922, 300, 0.38], etiqueta: 'Sala 2 · Mesopotamia', accion: 'vista', vista: 'arco' },
+    ],
+    paneles: { vista: 'obra', izq: [515, 478, 0.74], der: [855, 478, 0.74] },
+    elementos: [
+      { en: [700, 345, 0.84], texto: 'Costilla madurada en ceniza vegetal', lado: 'izq' },
+      { en: [1030, 480, 0.86], texto: 'Tubérculos asados en brasa', lado: 'der' },
+      { en: [430, 565, 0.9], texto: 'Tierra de cacao y carbón activado', lado: 'izq' },
+      { en: [1075, 420, 0.84], texto: 'Hierbas silvestres', lado: 'der' },
+      { en: [780, 515, 0.87], texto: 'Humo de encino', lado: 'der' },
+    ],
+    claves: [
+      { titulo: 'Punto focal', texto: 'La costilla, en diagonal sobre la losa' },
+      { titulo: 'Equilibrio', texto: 'Asimétrico: la carne contra los tubérculos' },
+      { titulo: 'Ritmo', texto: 'Irregular, como los restos de una fogata' },
+      { titulo: 'Altura', texto: 'Mínima, casi a ras de piedra' },
+      { titulo: 'Paleta', texto: 'Ocre, rojo de hierro, negro de carbón y un acento verde' },
     ],
     guia: [
       { frase: 'Bienvenido al origen', vista: 'sala' },

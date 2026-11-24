@@ -8,6 +8,7 @@ export function Hud({ sala }: { sala: Sala }) {
   const guiado = useEstado((e) => e.guiado)
   const nota = sala.vistas.find((v) => v.id === vista)?.nota
   const tomas = sala.vistas.filter((v) => v.id !== 'arco')
+  const cerca = vista === 'obra' || vista === 'platillo'
 
   return (
     <>
@@ -31,7 +32,7 @@ export function Hud({ sala }: { sala: Sala }) {
       )}
 
       {!audio && (
-        <div className="tomas">
+        <div className={`tomas ${cerca ? 'tomas--discreta' : ''}`}>
           <button className="tomas__guia" onClick={() => reproducirGuiado(sala)}>
             <svg viewBox="0 0 20 20"><path d="M6 4l10 6-10 6z" /></svg>
             Recorrido guiado

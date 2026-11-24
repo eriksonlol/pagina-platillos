@@ -79,19 +79,29 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .redondo:hover { border-color: var(--ocre); background: rgba(200,100,45,0.25); }
 
-/* ——— Puntos de luz ——— */
-.puntos { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.4s; }
-.puntos.oculto { opacity: 0; }
-.punto-luz {
-  position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none;
-  opacity: 0; transition: opacity 0.6s;
+/* ——— Capa 3D: puntos, paneles y etiquetas flotantes ——— */
+.vineta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 50%, rgba(8,5,3,0.7) 100%); }
+.grano {
+  position: absolute; inset: -50%; pointer-events: none; opacity: 0.07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grano 0.6s steps(3) infinite;
 }
-.punto-luz.visible { opacity: 1; pointer-events: auto; }
+@keyframes grano { 0% { transform: translate(0,0) } 33% { transform: translate(-3%,2%) } 66% { transform: translate(2%,-3%) } }
+.fundido { position: absolute; inset: 0; background: #0a0604; opacity: 0; pointer-events: none; }
+
+.capa3d { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.4s; }
+.capa3d.oculto { opacity: 0; }
+.capa3d > :not(.flotantes), .flotantes > * { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 0.7s; pointer-events: none; will-change: transform; }
+.flotantes { position: absolute; left: 0; top: 0; }
+.capa3d .visible { opacity: 1; pointer-events: auto; }
+
+.punto-luz { width: 0; height: 0; }
 .punto-luz__aro {
   position: absolute; left: -15px; top: -15px; width: 30px; height: 30px; border-radius: 50%;
   border: 1.5px solid rgba(255, 226, 190, 0.95); background: rgba(255, 200, 140, 0.18);
-  box-shadow: 0 0 18px rgba(255, 150, 70, 0.55);
+  box-shadow: 0 0 18px rgba(255, 150, 70, 0.55); transition: transform 0.4s;
 }
+.punto-luz:hover .punto-luz__aro { transform: scale(1.25); }
 .punto-luz__aro::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: #ffe3c2; }
 .punto-luz__aro::after {
   content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 1px solid rgba(255, 226, 190, 0.8);
@@ -106,6 +116,68 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .punto-luz:hover .punto-luz__texto, .punto-luz:focus-visible .punto-luz__texto { opacity: 1; transform: none; }
 @media (hover: none) { .punto-luz__texto { opacity: 0.92; transform: none; font-size: 0.85rem; } }
 
+.flotante {
+  width: 19rem; padding: 1.2rem 1.3rem 1.3rem; color: var(--hueso);
+  background: linear-gradient(160deg, rgba(30, 20, 13, 0.72), rgba(14, 9, 6, 0.6));
+  backdrop-filter: blur(8px) saturate(1.1); border: 1px solid rgba(239, 228, 208, 0.14);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45); transform-origin: center;
+}
+.flotante--izq { border-right: 2px solid var(--ocre); }
+.flotante--der { border-left: 2px solid var(--ocre); }
+.flotante::after { content: ''; position: absolute; top: 50%; width: 2.4rem; height: 1px; background: linear-gradient(90deg, var(--ocre), rgba(200,100,45,0.2)); }
+.flotante--izq::after { left: 100%; }
+.flotante--der::after { right: 100%; transform: scaleX(-1); }
+.flotante h3 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 1.7rem; line-height: 1.05; margin: 0.3rem 0 0.8rem; }
+.flotante h4 { font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; color: var(--ocre-claro); margin-bottom: 0.4rem; }
+.flotante p:not(.volada) { font-family: var(--serif); font-size: 0.86rem; line-height: 1.55; color: #e6dac6; }
+.flotante__acciones { display: grid; gap: 0.4rem; margin-top: 1rem; }
+.boton-flotante {
+  text-align: left; padding: 0.55rem 0.8rem; border: 1px solid rgba(239,228,208,0.25); font-size: 0.8rem; transition: 0.3s;
+}
+.boton-flotante:hover { border-color: var(--ocre); background: rgba(200,100,45,0.18); }
+.boton-flotante--lleno { background: var(--ocre); border-color: var(--ocre); color: var(--papel); }
+.boton-flotante--lleno:hover { background: #d8743c; }
+
+.elemento { width: 0; height: 0; transition: opacity 0.8s; }
+.elemento__punto { position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: #ffe3c2; box-shadow: 0 0 0 4px rgba(255,227,194,0.25), 0 0 14px rgba(255,160,80,0.8); }
+.elemento__linea { position: absolute; top: 0; width: 4.5rem; height: 1px; background: rgba(255,227,194,0.75); }
+.elemento--izq .elemento__linea { right: 6px; }
+.elemento--der .elemento__linea { left: 6px; }
+.elemento__texto {
+  position: absolute; top: -0.8rem; white-space: nowrap; font-family: var(--serif); font-style: italic; font-size: 1rem;
+  color: var(--papel); text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);
+}
+.elemento--izq .elemento__texto { right: calc(4.5rem + 14px); }
+.elemento--der .elemento__texto { left: calc(4.5rem + 14px); }
+
+.capa3d .claves {
+  left: 50%; top: auto; bottom: 6.2rem; translate: -50% 0; width: min(64rem, calc(100% - 3rem));
+  padding: 0.9rem 1.2rem; background: rgba(14, 9, 6, 0.55); backdrop-filter: blur(6px); border-top: 2px solid var(--ocre);
+}
+.claves dl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; margin-top: 0.5rem; }
+.claves dt { font-size: 0.64rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ocre-claro); }
+.claves dd { font-family: var(--serif); font-size: 0.9rem; line-height: 1.35; }
+.capa3d .volver { left: auto; right: 1.4rem; top: 6rem; }
+.volver { padding: 0.6rem 1rem; border: 1px solid rgba(239,228,208,0.35); border-radius: 99px; background: rgba(14,9,6,0.5); font-size: 0.82rem; backdrop-filter: blur(6px); }
+.volver:hover { border-color: var(--ocre); }
+
+@media (max-width: 700px) {
+  .flotantes { position: absolute; left: 0.8rem; right: 0.8rem; bottom: 5.2rem; top: auto; display: flex; gap: 0.6rem; overflow-x: auto; scroll-snap-type: x mandatory; opacity: 1; pointer-events: none; }
+  .flotantes > * { position: relative; flex: 0 0 85%; scroll-snap-align: start; max-height: 46vh; overflow-y: auto; }
+  .flotantes > .visible { pointer-events: auto; }
+  .flotantes:has(.visible) { pointer-events: auto; }
+  .flotante::after { display: none; }
+  .flotante { width: auto; }
+  .capa3d .claves { bottom: 5.2rem; width: calc(100% - 1.6rem); padding: 0.7rem 0.9rem; }
+  .claves dl { grid-template-columns: 1fr 1fr; gap: 0.4rem 0.8rem; }
+  .claves dd { font-size: 0.78rem; }
+  .capa3d .volver { right: 0.8rem; top: 5.4rem; }
+  .elemento__texto { font-size: 0.82rem; }
+  .elemento__linea { width: 2rem; }
+  .elemento--izq .elemento__texto { right: calc(2rem + 12px); }
+  .elemento--der .elemento__texto { left: calc(2rem + 12px); }
+}
+
 /* ——— Tomas y recorrido guiado ——— */
 .tomas {
   position: absolute; left: 50%; bottom: max(1.4rem, env(safe-area-inset-bottom)); transform: translateX(-50%);
@@ -113,6 +185,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: rgba(18, 12, 8, 0.55); backdrop-filter: blur(10px); border: 1px solid rgba(239, 228, 208, 0.16); border-radius: 99px;
   animation: sube 0.8s 0.4s ease both;
 }
+.tomas--discreta { opacity: 0.55; transition: opacity 0.3s; }
+.tomas--discreta:hover { opacity: 1; }
 .tomas__guia {
   flex: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.1rem 0.65rem 0.8rem; border-radius: 99px;
   background: var(--ocre); color: var(--papel); font-size: 0.82rem; font-weight: 500; letter-spacing: 0.02em;
@@ -197,7 +271,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .numero { font-size: 2.4rem; }
   .botonera { right: 0.8rem; flex-direction: column; }
   .tomas { left: 0.8rem; right: 0.8rem; transform: none; max-width: none; }
-  .tomas__guia { padding: 0.6rem 0.9rem 0.6rem 0.7rem; }
+  .tomas--discreta { opacity: 0.55; transition: opacity 0.3s; }
+.tomas--discreta:hover { opacity: 1; }
+.tomas__guia { padding: 0.6rem 0.9rem 0.6rem 0.7rem; }
   .nota-vista { left: 1rem; right: 1rem; bottom: 5.6rem; font-size: 0.95rem; }
   .sello-guiado { top: auto; bottom: 9.5rem; }
   .redondo { width: 3.1rem; height: 3.1rem; font-size: 0.6rem; }

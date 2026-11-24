@@ -5,15 +5,17 @@ Proyecto final de *Arte en Platillos y Montaje*. Hecho con React, Three.js y Rea
 
 ## Estado
 
-Prototipo de la **Sala 1 · Prehistoria** como recorrido cinematográfico: la sala se construye con
-los renders de Gemini, cada uno con un mapa de profundidad (`*-prof.png`, blanco = cerca) que da
-paralaje 2.5D. Encima se animan la brasa, el humo y las chispas. La cámara pasa entre tomas
-(sala, obra, platillo, pinturas, atril) y el recorrido guiado cambia de toma al ritmo de la audioguía.
+Prototipo de la **Sala 1 · Prehistoria**. La sala se levanta en 3D a partir de los renders de
+Gemini: cada render está partido en capas (muros, pedestal, atril) y cada capa se deforma con su
+mapa de profundidad (`*-prof.png`, blanco = cerca). Como la cámara es real, al moverse el atril
+pasa por delante de los muros. Encima se animan la brasa, el humo y las chispas.
 
 ## Cómo se recorre
 
-- Mover el cursor o arrastrar para mirar alrededor.
-- Tocar los puntos de luz, o los botones de toma, para acercarse.
+- El cursor (o el dedo) guía la mirada: la cámara se desliza hacia donde apuntas.
+- Al pasar sobre un punto de luz la cámara se inclina hacia él; con clic se acerca.
+- En «La obra», el análisis y el contexto flotan a los lados del pedestal.
+- En «El platillo» se ve la obra desde arriba con sus elementos señalados.
 - «Recorrido guiado» reproduce la audioguía y mueve la cámara con ella.
 
 ## Desarrollo
@@ -28,5 +30,5 @@ npm run build    # genera dist/ para publicar (Vercel o Netlify)
 - Las imágenes de cada sala van en `public/salas/NN/`.
 - Para usar la grabación final de la audioguía, copia el archivo a `public/salas/NN/` y pon su ruta en
   el campo `audio` de la sala. Mientras ese campo sea `null` se usa una voz provisional del navegador.
-- Las tomas, los puntos de luz y los cambios del recorrido guiado se definen en `salas.ts` con
-  coordenadas en píxeles del render.
+- Las capas, tomas, puntos de luz y paneles se definen en `salas.ts` con coordenadas en píxeles
+  del render y su cercanía (0 lejos, 1 cerca).
