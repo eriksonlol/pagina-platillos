@@ -4,6 +4,7 @@ import type { P3, Sala } from '../data/salas'
 import { camara, mundo } from '../scene/Escena'
 import { setEstado, useEstado } from '../lib/store'
 import { reproducirGuiado } from '../lib/recorrido'
+import { irASala } from '../lib/navegacion'
 
 // Todo lo que flota en la sala: puntos de luz, paneles junto a la obra,
 // etiquetas de los elementos del platillo. Se anclan a puntos 3D y se
@@ -15,6 +16,7 @@ export function Capa3D({ sala }: { sala: Sala }) {
   const anclas = useRef<Map<string, Ancla>>(new Map())
   const vista = useEstado((e) => e.vista)
   const panel = useEstado((e) => e.panel)
+  const resaltado = useEstado((e) => e.resaltado)
   const v = useRef(vista)
   v.current = vista
 
@@ -77,7 +79,12 @@ export function Capa3D({ sala }: { sala: Sala }) {
           className="punto-luz"
           onPointerEnter={inclinar(pt.en, pt.escena)}
           onPointerLeave={inclinar(null)}
-          onClick={() => (pt.accion === 'audio' ? (inclinar(null)(), reproducirGuiado(sala)) : ir(pt.vista!))}
+          onClick={() => {
+            inclinar(null)()
+            if (pt.accion === 'audio') reproducirGuiado(sala)
+            else if (pt.accion === 'sala') irASala(pt.sala!)
+            else ir(pt.vista!)
+          }}
         >
           <span className="punto-luz__aro" />
           <span className="punto-luz__texto">{pt.etiqueta}</span>
@@ -105,7 +112,7 @@ export function Capa3D({ sala }: { sala: Sala }) {
 
       {/* elementos del platillo, señalados sobre la obra */}
       {sala.elementos.map((el, i) => (
-        <div key={i} ref={reg('el-' + i, { escena: 'platillo', en: el.en, vista: 'platillo', modo: 'punto' })} className={`elemento elemento--${el.lado}`} style={{ transitionDelay: `${0.2 + i * 0.15}s` }}>
+        <div key={i} ref={reg('el-' + i, { escena: 'platillo', en: el.en, vista: 'platillo', modo: 'punto' })} className={`elemento elemento--${el.lado} ${resaltado === null ? '' : resaltado === i ? 'elemento--activo' : 'elemento--tenue'}`} style={{ transitionDelay: `${0.2 + i * 0.15}s` }}>
           <span className="elemento__punto" />
           <span className="elemento__linea" />
           <span className="elemento__texto">{el.texto}</span>

@@ -13,7 +13,7 @@ export function Hud({ sala }: { sala: Sala }) {
   return (
     <>
       <header className="cartela">
-        <span className="numero">0{sala.numero}</span>
+        <span className="numero">{String(sala.numero).padStart(2, '0')}</span>
         <div>
           <p className="volada">{sala.acto}</p>
           <h2>{sala.nombre}</h2>
@@ -22,6 +22,9 @@ export function Hud({ sala }: { sala: Sala }) {
       </header>
 
       <nav className="botonera">
+        <button className="redondo" title="Mapa del recorrido" onClick={() => setEstado({ panel: 'mapa' })}>
+          Salas
+        </button>
         <button className="redondo" title="Ficha de la obra" onClick={() => setEstado({ panel: 'ficha' })}>
           Ficha
         </button>

@@ -1,5 +1,6 @@
 // Contenido curatorial de cada sala. Fuente: Dossier curatorial "Del fuego al lienzo".
-// Para agregar una sala nueva basta con sumar un objeto a este arreglo.
+// La Sala 1 se escribió a mano; las salas 2 a 12 están en salas-resto.ts.
+import { salasResto } from './salas-resto'
 
 /**
  * Cada escena es un render de Gemini partido en capas (fondo, pedestal, atril...).
@@ -27,8 +28,9 @@ export type Vista = {
   libertad?: number // cuánto se mueve la cámara con el cursor
   nota?: string
 }
-export type Punto = { id: string; escena: string; en: P3; etiqueta: string; accion: 'vista' | 'audio'; vista?: string }
-export type Elemento = { en: P3; texto: string; lado: 'izq' | 'der' }
+export type Punto = { id: string; escena: string; en: P3; etiqueta: string; accion: 'vista' | 'audio' | 'sala'; vista?: string; sala?: number }
+/** `palabra`: fragmento del guion que, al sonar, enciende este elemento durante el recorrido guiado. */
+export type Elemento = { en: P3; texto: string; lado: 'izq' | 'der'; palabra?: string }
 
 export type Sala = {
   numero: number
@@ -42,7 +44,10 @@ export type Sala = {
   contexto: string
   ingredientes: string[]
   guion: string
-  /** Ruta del audio grabado. Si es null se usa una voz provisional del navegador. */
+  /**
+   * Ruta del audio grabado (salas/NN/audioguia.mp3). Si el archivo no existe todavía,
+   * se usa una voz provisional del navegador con subtítulos.
+   */
   audio: string | null
   imagenes: { src: string; pie: string }[]
   siguiente?: string
@@ -60,7 +65,7 @@ export type Sala = {
   guia: { frase: string; vista: string }[]
 }
 
-export const salas: Sala[] = [
+const sala1: Sala =
   {
     numero: 1,
     slug: 'prehistoria',
@@ -82,7 +87,7 @@ export const salas: Sala[] = [
     ],
     guion:
       'Bienvenido al origen. Antes de los platos, antes de la mesa, hubo fuego. Mira la losa de piedra volcánica: es el primer soporte de la historia. Ahora sigue la diagonal de la costilla. Esa línea es el centro de todo, como lo fue la pieza de caza para el grupo que se reunía alrededor de la hoguera. Observa los tubérculos dispersos del otro lado: equilibran el peso sin ordenarse, igual que los restos de un fuego que se apaga. La paleta es la de las cuevas: ocre, rojo y negro de carbón. Nada está disfrazado. El alimento se muestra tal como es, con la huella del fuego en su superficie. Aquí comienza el montaje: no en el plato, sino en el lugar donde comer se volvió un acto compartido.',
-    audio: null,
+    audio: 'salas/01/audioguia.mp3',
     imagenes: [
       { src: 'salas/01/platillo.webp', pie: 'Brasa primigenia. Imagen generada con Gemini.' },
       { src: 'salas/01/espacio.webp', pie: 'Concepto espacial de la sala. Imagen generada con Gemini.' },
@@ -114,21 +119,21 @@ export const salas: Sala[] = [
       { id: 'platillo', nombre: 'El platillo', escena: 'platillo', pos: [0, 0.2, -0.1], mira: [690, 430, 0.84], fov: 46, libertad: 0.5 },
       { id: 'pinturas', nombre: 'Pinturas', escena: 'sala', pos: [-0.35, 0.05, -0.9], mira: [390, 300, 0.48], fov: 40, libertad: 0.7, nota: 'La paleta de la obra sale de estos muros: ocre, rojo de hierro y negro de carbón.' },
       { id: 'atril', nombre: 'Atril', escena: 'sala', pos: [0.45, 0.1, -1.3], mira: [858, 540, 0.86], fov: 40 },
-      { id: 'arco', nombre: 'Siguiente sala', escena: 'sala', pos: [0.55, 0, -1.6], mira: [922, 330, 0.38], fov: 40, nota: 'Por este arco se pasa a la Sala 2, Mesopotamia. Próximamente.' },
+      { id: 'arco', nombre: 'Siguiente sala', escena: 'sala', pos: [0.55, 0, -1.6], mira: [922, 330, 0.38], fov: 40, nota: 'Cruza para pasar a la Sala 2, Mesopotamia.' },
     ],
     puntos: [
       { id: 'obra', escena: 'sala', en: [700, 418, 0.75], etiqueta: 'Brasa primigenia', accion: 'vista', vista: 'obra' },
       { id: 'atril', escena: 'sala', en: [858, 610, 0.86], etiqueta: 'Audioguía', accion: 'audio' },
       { id: 'pinturas', escena: 'sala', en: [175, 250, 0.6], etiqueta: 'Pinturas rupestres', accion: 'vista', vista: 'pinturas' },
-      { id: 'arco', escena: 'sala', en: [922, 300, 0.38], etiqueta: 'Sala 2 · Mesopotamia', accion: 'vista', vista: 'arco' },
+      { id: 'arco', escena: 'sala', en: [922, 300, 0.38], etiqueta: 'Sala 2 · Mesopotamia', accion: 'sala', sala: 2 },
     ],
     paneles: { vista: 'obra', izq: [515, 478, 0.74], der: [855, 478, 0.74] },
     elementos: [
-      { en: [700, 345, 0.84], texto: 'Costilla madurada en ceniza vegetal', lado: 'izq' },
-      { en: [1030, 480, 0.86], texto: 'Tubérculos asados en brasa', lado: 'der' },
+      { en: [700, 345, 0.84], texto: 'Costilla madurada en ceniza vegetal', lado: 'izq', palabra: 'diagonal de la costilla' },
+      { en: [1030, 480, 0.86], texto: 'Tubérculos asados en brasa', lado: 'der', palabra: 'tubérculos' },
       { en: [430, 565, 0.9], texto: 'Tierra de cacao y carbón activado', lado: 'izq' },
       { en: [1075, 420, 0.84], texto: 'Hierbas silvestres', lado: 'der' },
-      { en: [780, 515, 0.87], texto: 'Humo de encino', lado: 'der' },
+      { en: [780, 515, 0.87], texto: 'Humo de encino', lado: 'der', palabra: 'huella del fuego' },
     ],
     claves: [
       { titulo: 'Punto focal', texto: 'La costilla, en diagonal sobre la losa' },
@@ -145,5 +150,6 @@ export const salas: Sala[] = [
       { frase: 'Nada está disfrazado', vista: 'platillo' },
       { frase: 'Aquí comienza el montaje', vista: 'sala' },
     ],
-  },
-]
+}
+
+export const salas: Sala[] = [sala1, ...salasResto]

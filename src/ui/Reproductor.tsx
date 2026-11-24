@@ -21,7 +21,7 @@ export function Reproductor({ sala }: { sala: Sala }) {
           <div className="pista"><div style={{ width: `${a.progreso * 100}%` }} /></div>
           {a.provisional && <span className="nota">Voz provisional, se reemplaza por la grabación final</span>}
         </div>
-        <button className="reproductor__cerrar" onClick={detener} aria-label="Cerrar audioguía">×</button>
+        <button className="reproductor__cerrar" onClick={() => detener()} aria-label="Cerrar audioguía">×</button>
       </div>
     </div>
   )
