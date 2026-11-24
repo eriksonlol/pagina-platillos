@@ -23,15 +23,8 @@ body {
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 
 .museo { position: fixed; inset: 0; }
-.lienzo { position: absolute !important; inset: 0; touch-action: none; }
-
-.grano {
-  position: absolute; inset: -50%; pointer-events: none; opacity: 0.09; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grano 0.6s steps(3) infinite;
-}
-@keyframes grano { 0% { transform: translate(0,0) } 33% { transform: translate(-3%,2%) } 66% { transform: translate(2%,-3%) } }
-.vineta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(8,5,3,0.75) 100%); }
+.lienzo { position: absolute !important; inset: 0; touch-action: none; cursor: grab; }
+.lienzo:active { cursor: grabbing; }
 
 .volada { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ocre-claro); font-weight: 500; }
 .numero { font-family: var(--serif); font-style: italic; font-size: 3.2rem; line-height: 0.8; color: var(--ocre); }
@@ -78,18 +71,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cartela h2 { font-family: var(--serif); font-weight: 400; font-size: 1.7rem; line-height: 1.1; margin-top: 0.15rem; }
 .cartela__lema { font-size: 0.85rem; color: #cbbca8; max-width: 17rem; }
 
-.acciones { position: absolute; left: 50%; bottom: 7.5rem; transform: translate(-50%, 10px); opacity: 0; transition: 0.4s; pointer-events: none; }
-.acciones.arriba { bottom: 13rem; }
-.acciones.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
-.pastilla {
-  display: flex; align-items: center; gap: 0.6rem; white-space: nowrap;
-  background: rgba(246,239,226,0.94); color: var(--tinta); padding: 0.75rem 1.3rem; border-radius: 99px;
-  font-size: 0.88rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-.pastilla em { font-family: var(--serif); font-size: 1rem; }
-.punto { width: 8px; height: 8px; border-radius: 50%; background: var(--ocre); box-shadow: 0 0 0 0 var(--ocre); animation: late 1.6s infinite; }
-@keyframes late { 70% { box-shadow: 0 0 0 9px rgba(200,100,45,0); } 100% { box-shadow: 0 0 0 0 rgba(200,100,45,0); } }
-
 .botonera { position: absolute; top: max(1.4rem, env(safe-area-inset-top)); right: 1.4rem; display: flex; gap: 0.5rem; }
 .redondo {
   width: 3.6rem; height: 3.6rem; border-radius: 50%; border: 1px solid rgba(239,228,208,0.35);
@@ -98,7 +79,61 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .redondo:hover { border-color: var(--ocre); background: rgba(200,100,45,0.25); }
 
-.ayuda-pie { position: absolute; bottom: 1.2rem; left: 1.6rem; font-size: 0.72rem; color: rgba(239,228,208,0.5); letter-spacing: 0.05em; pointer-events: none; }
+/* ——— Puntos de luz ——— */
+.puntos { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.4s; }
+.puntos.oculto { opacity: 0; }
+.punto-luz {
+  position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none;
+  opacity: 0; transition: opacity 0.6s;
+}
+.punto-luz.visible { opacity: 1; pointer-events: auto; }
+.punto-luz__aro {
+  position: absolute; left: -15px; top: -15px; width: 30px; height: 30px; border-radius: 50%;
+  border: 1.5px solid rgba(255, 226, 190, 0.95); background: rgba(255, 200, 140, 0.18);
+  box-shadow: 0 0 18px rgba(255, 150, 70, 0.55);
+}
+.punto-luz__aro::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: #ffe3c2; }
+.punto-luz__aro::after {
+  content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 1px solid rgba(255, 226, 190, 0.8);
+  animation: onda 2.4s ease-out infinite;
+}
+@keyframes onda { to { transform: scale(2.2); opacity: 0; } }
+.punto-luz__texto {
+  position: absolute; left: 24px; top: -13px; white-space: nowrap; padding: 0.3rem 0.75rem; border-radius: 99px;
+  background: rgba(246, 239, 226, 0.94); color: var(--tinta); font-family: var(--serif); font-style: italic; font-size: 0.95rem;
+  opacity: 0; transform: translateX(-6px); transition: 0.3s; pointer-events: none; box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+}
+.punto-luz:hover .punto-luz__texto, .punto-luz:focus-visible .punto-luz__texto { opacity: 1; transform: none; }
+@media (hover: none) { .punto-luz__texto { opacity: 0.92; transform: none; font-size: 0.85rem; } }
+
+/* ——— Tomas y recorrido guiado ——— */
+.tomas {
+  position: absolute; left: 50%; bottom: max(1.4rem, env(safe-area-inset-bottom)); transform: translateX(-50%);
+  display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem; max-width: calc(100% - 1.6rem);
+  background: rgba(18, 12, 8, 0.55); backdrop-filter: blur(10px); border: 1px solid rgba(239, 228, 208, 0.16); border-radius: 99px;
+  animation: sube 0.8s 0.4s ease both;
+}
+.tomas__guia {
+  flex: none; display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.1rem 0.65rem 0.8rem; border-radius: 99px;
+  background: var(--ocre); color: var(--papel); font-size: 0.82rem; font-weight: 500; letter-spacing: 0.02em;
+}
+.tomas__guia svg { width: 0.85rem; fill: currentColor; }
+.tomas__lista { display: flex; gap: 0.15rem; overflow-x: auto; scrollbar-width: none; }
+.tomas__lista button {
+  flex: none; padding: 0.6rem 0.85rem; border-radius: 99px; font-size: 0.82rem; color: #d9ccb8; transition: 0.3s;
+}
+.tomas__lista button:hover { color: var(--hueso); background: rgba(239, 228, 208, 0.08); }
+.tomas__lista button.activa { color: var(--tinta); background: rgba(246, 239, 226, 0.92); }
+.nota-vista {
+  position: absolute; left: 1.6rem; bottom: 6.2rem; max-width: 22rem; font-family: var(--serif); font-style: italic;
+  font-size: 1.05rem; line-height: 1.45; text-shadow: 0 2px 12px rgba(0,0,0,0.85); animation: sube 0.9s 1.6s ease both;
+  padding-left: 1rem; border-left: 2px solid var(--ocre);
+}
+.sello-guiado {
+  position: absolute; top: max(1.6rem, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+  font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ocre-claro);
+  padding: 0.4rem 0.9rem; border: 1px solid rgba(229,154,92,0.4); border-radius: 99px; background: rgba(18,12,8,0.4);
+}
 
 /* ——— Reproductor ——— */
 .reproductor {
@@ -161,9 +196,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .cartela__lema { display: none; }
   .numero { font-size: 2.4rem; }
   .botonera { right: 0.8rem; flex-direction: column; }
+  .tomas { left: 0.8rem; right: 0.8rem; transform: none; max-width: none; }
+  .tomas__guia { padding: 0.6rem 0.9rem 0.6rem 0.7rem; }
+  .nota-vista { left: 1rem; right: 1rem; bottom: 5.6rem; font-size: 0.95rem; }
+  .sello-guiado { top: auto; bottom: 9.5rem; }
   .redondo { width: 3.1rem; height: 3.1rem; font-size: 0.6rem; }
-  .ayuda-pie { display: none; }
-  .acciones { bottom: 8.5rem; }
   .ficha { top: 8vh; width: 100%; transform: translateY(102%); border-radius: 14px 14px 0 0; }
   .ficha.abierta { transform: none; }
   .ficha__texto { padding: 1.4rem 1.4rem 3rem; }

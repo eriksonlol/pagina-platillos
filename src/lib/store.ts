@@ -1,22 +1,20 @@
 import { useSyncExternalStore } from 'react'
 
-// Estado global mínimo compartido entre la escena 3D y la interfaz.
-export type Foco = 'obra' | 'atril' | null
-
+// Estado global mínimo compartido entre la escena y la interfaz.
 type Estado = {
   dentro: boolean
   panel: 'ficha' | null
-  cerca: Foco
+  vista: string
+  guiado: boolean
   audio: { activo: boolean; reproduciendo: boolean; progreso: number; frase: string; provisional: boolean }
-  caminarA: [number, number] | null
 }
 
 let estado: Estado = {
   dentro: false,
   panel: null,
-  cerca: null,
+  vista: 'sala',
+  guiado: false,
   audio: { activo: false, reproduciendo: false, progreso: 0, frase: '', provisional: true },
-  caminarA: null,
 }
 const oyentes = new Set<() => void>()
 

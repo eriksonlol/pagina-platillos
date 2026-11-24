@@ -46,7 +46,10 @@ export function reproducir(sala: Sala) {
   if (sala.audio) {
     audioEl = new Audio(sala.audio)
     audioEl.ontimeupdate = () => audioEl && actualizar(audioEl.currentTime / (audioEl.duration || 1), !audioEl.paused)
-    audioEl.onended = () => actualizar(1, false)
+    audioEl.onended = () => {
+      actualizar(1, false)
+      setEstado({ guiado: false })
+    }
     void audioEl.play()
     return
   }
@@ -71,7 +74,10 @@ export function reproducir(sala: Sala) {
   const v = vozEspanol()
   if (v) u.voice = v
   u.onboundary = (ev) => actualizar(ev.charIndex / total, true)
-  u.onend = () => actualizar(1, false)
+  u.onend = () => {
+    actualizar(1, false)
+    setEstado({ guiado: false })
+  }
   speechSynthesis.speak(u)
 }
 
@@ -97,5 +103,5 @@ export function detener() {
     audioEl = null
   }
   if ('speechSynthesis' in window) speechSynthesis.cancel()
-  setEstado((e) => ({ audio: { ...e.audio, activo: false, reproduciendo: false, progreso: 0, frase: '' } }))
+  setEstado((e) => ({ guiado: false, audio: { ...e.audio, activo: false, reproduciendo: false, progreso: 0, frase: '' } }))
 }

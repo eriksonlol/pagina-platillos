@@ -1,11 +1,14 @@
 import type { Sala } from '../data/salas'
 import { setEstado, useEstado } from '../lib/store'
-import { reproducir } from '../lib/audioguia'
+import { reproducirGuiado } from '../lib/recorrido'
 
 export function Hud({ sala }: { sala: Sala }) {
-  const cerca = useEstado((e) => e.cerca)
-  const panel = useEstado((e) => e.panel)
+  const vista = useEstado((e) => e.vista)
   const audio = useEstado((e) => e.audio.activo)
+  const guiado = useEstado((e) => e.guiado)
+  const nota = sala.vistas.find((v) => v.id === vista)?.nota
+  const tomas = sala.vistas.filter((v) => v.id !== 'arco')
+
   return (
     <>
       <header className="cartela">
@@ -17,31 +20,36 @@ export function Hud({ sala }: { sala: Sala }) {
         </div>
       </header>
 
-      <div className={`acciones ${cerca && !panel ? 'visible' : ''} ${audio ? 'arriba' : ''}`}>
-        {cerca === 'obra' && (
-          <button className="pastilla" onClick={() => setEstado({ panel: 'ficha' })}>
-            <span className="punto" /> Ver ficha · <em>{sala.obra}</em>
-          </button>
-        )}
-        {cerca === 'atril' && !audio && (
-          <button className="pastilla" onClick={() => reproducir(sala)}>
-            <span className="punto" /> Escuchar audioguía
-          </button>
-        )}
-      </div>
-
       <nav className="botonera">
         <button className="redondo" title="Ficha de la obra" onClick={() => setEstado({ panel: 'ficha' })}>
           Ficha
         </button>
-        {!audio && (
-          <button className="redondo" title="Audioguía" onClick={() => reproducir(sala)}>
-            Audio
-          </button>
-        )}
       </nav>
 
-      <p className="ayuda-pie">Arrastra para mirar · W A S D o toca el piso para caminar</p>
+      {nota && !audio && (
+        <p key={vista} className="nota-vista">{nota}</p>
+      )}
+
+      {!audio && (
+        <div className="tomas">
+          <button className="tomas__guia" onClick={() => reproducirGuiado(sala)}>
+            <svg viewBox="0 0 20 20"><path d="M6 4l10 6-10 6z" /></svg>
+            Recorrido guiado
+          </button>
+          <div className="tomas__lista">
+            {tomas.map((v) => (
+              <button
+                key={v.id}
+                className={v.id === vista ? 'activa' : ''}
+                onClick={() => setEstado({ vista: v.id, guiado: false })}
+              >
+                {v.nombre}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {guiado && <p className="sello-guiado">Recorrido guiado</p>}
     </>
   )
 }

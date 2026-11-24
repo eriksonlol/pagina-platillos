@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Sala } from '../data/salas'
 import { setEstado, useEstado } from '../lib/store'
-import { reproducir } from '../lib/audioguia'
+import { reproducirGuiado } from '../lib/recorrido'
 
 export function Ficha({ sala }: { sala: Sala }) {
   const abierta = useEstado((e) => e.panel === 'ficha')
@@ -48,7 +48,7 @@ export function Ficha({ sala }: { sala: Sala }) {
             {sala.ingredientes.map((i) => <li key={i}>{i}</li>)}
           </ul>
 
-          <button className="boton boton--claro" onClick={() => { cerrar(); reproducir(sala) }}>
+          <button className="boton boton--claro" onClick={() => { cerrar(); reproducirGuiado(sala) }}>
             Escuchar la audioguía
           </button>
         </div>

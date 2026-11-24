@@ -31,9 +31,9 @@ export function Entrada({ sala }: { sala: Sala }) {
           Entrar a la sala
         </button>
         <ul className="entrada__ayuda">
-          <li><kbd>Arrastra</kbd> para mirar alrededor</li>
-          <li><kbd>W A S D</kbd> o <kbd>toca el piso</kbd> para caminar</li>
-          <li><kbd>Toca el platillo</kbd> para su ficha y <kbd>el atril</kbd> para la audioguía</li>
+          <li><kbd>Toca los puntos de luz</kbd> para acercarte a la obra, el atril o los muros</li>
+          <li><kbd>Recorrido guiado</kbd> para que la audioguía te lleve por la sala</li>
+          <li><kbd>Mueve el cursor</kbd> o arrastra para mirar alrededor</li>
         </ul>
         <p className="nota">Prototipo · Sala 1 de 12 · Con sonido</p>
       </div>

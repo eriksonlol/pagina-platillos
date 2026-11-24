@@ -1,6 +1,18 @@
 // Contenido curatorial de cada sala. Fuente: Dossier curatorial "Del fuego al lienzo".
 // Para agregar una sala nueva basta con sumar un objeto a este arreglo.
 
+/** Coordenadas en píxeles de la imagen (origen arriba a la izquierda). */
+export type Imagen = {
+  src: string
+  prof: string // mapa de profundidad en escala de grises (blanco = cerca)
+  ancho: number
+  alto: number
+  fuego?: [number, number, number, number] // centro y radios del resplandor
+  humo?: [number, number] // origen de la columna de humo
+}
+export type Vista = { id: string; nombre: string; img: number; x: number; y: number; zoom: number; nota?: string }
+export type Punto = { id: string; img: number; x: number; y: number; etiqueta: string; accion: 'vista' | 'ficha' | 'audio' | 'siguiente'; vista?: string }
+
 export type Sala = {
   numero: number
   slug: string
@@ -17,6 +29,12 @@ export type Sala = {
   audio: string | null
   imagenes: { src: string; pie: string }[]
   siguiente?: string
+  /** Renders que forman la sala y tomas de cámara sobre ellos. */
+  escena: Imagen[]
+  vistas: Vista[]
+  puntos: Punto[]
+  /** Cambios de toma durante el recorrido guiado: frase del guion donde empieza cada toma. */
+  guia: { frase: string; vista: string }[]
 }
 
 export const salas: Sala[] = [
@@ -47,5 +65,32 @@ export const salas: Sala[] = [
       { src: 'salas/01/espacio.webp', pie: 'Concepto espacial de la sala. Imagen generada con Gemini.' },
     ],
     siguiente: 'Mesopotamia',
+    escena: [
+      { src: 'salas/01/espacio.webp', prof: 'salas/01/espacio-prof.png', ancho: 1376, alto: 768, fuego: [682, 462, 170, 34], humo: [700, 405] },
+      { src: 'salas/01/platillo.webp', prof: 'salas/01/platillo-prof.png', ancho: 1376, alto: 768, fuego: [560, 150, 300, 140] },
+    ],
+    vistas: [
+      { id: 'sala', nombre: 'La sala', img: 0, x: 688, y: 384, zoom: 1 },
+      { id: 'obra', nombre: 'La obra', img: 0, x: 680, y: 450, zoom: 1.9 },
+      { id: 'platillo', nombre: 'El platillo', img: 1, x: 688, y: 430, zoom: 1.15 },
+      { id: 'pinturas', nombre: 'Pinturas', img: 0, x: 250, y: 290, zoom: 1.6, nota: 'La paleta de la obra sale de estos muros: ocre, rojo de hierro y negro de carbón.' },
+      { id: 'atril', nombre: 'Atril', img: 0, x: 858, y: 545, zoom: 2.2 },
+      { id: 'arco', nombre: 'Siguiente sala', img: 0, x: 922, y: 330, zoom: 1.9, nota: 'Por este arco se pasa a la Sala 2, Mesopotamia. Próximamente.' },
+    ],
+    puntos: [
+      { id: 'obra', img: 0, x: 692, y: 425, etiqueta: 'Brasa primigenia', accion: 'vista', vista: 'platillo' },
+      { id: 'atril', img: 0, x: 858, y: 620, etiqueta: 'Audioguía', accion: 'audio' },
+      { id: 'pinturas', img: 0, x: 175, y: 250, etiqueta: 'Pinturas rupestres', accion: 'vista', vista: 'pinturas' },
+      { id: 'arco', img: 0, x: 922, y: 300, etiqueta: 'Sala 2 · Mesopotamia', accion: 'vista', vista: 'arco' },
+      { id: 'ficha', img: 1, x: 700, y: 360, etiqueta: 'Ver ficha de la obra', accion: 'ficha' },
+    ],
+    guia: [
+      { frase: 'Bienvenido al origen', vista: 'sala' },
+      { frase: 'Mira la losa', vista: 'obra' },
+      { frase: 'Ahora sigue la diagonal', vista: 'platillo' },
+      { frase: 'La paleta es la de las cuevas', vista: 'pinturas' },
+      { frase: 'Nada está disfrazado', vista: 'platillo' },
+      { frase: 'Aquí comienza el montaje', vista: 'sala' },
+    ],
   },
 ]
