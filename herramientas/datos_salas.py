@@ -112,7 +112,7 @@ def sala(n):
     # la cámara avanza como mucho un tercio del camino: más allá, el render se deforma
     D = max(2.7, 0.66 * dist)
     pos_obra = [T[0] * (1 - D / dist), T[1] + 0.12 * D + 0.25, T[2] * (1 - D / dist)]
-    fov_obra = max(22, min(46, 46 * 2.7 / D * 1.15))
+    fov_obra = max(27, min(46, 46 * 2.7 / D * 1.15))
     # separación máxima de los paneles (px del render) para que quepan en la toma cercana, como en la Sala 1
     margen = round(170 * 3.71 / ((dist / D) / math.tan(math.radians(fov_obra / 2))))
     A = mundo(W, H, [ms['atril'][0], ms['atril'][1], ms['nAtr']])
@@ -162,7 +162,7 @@ def sala(n):
         escenas=dict(sala=sala_esc, platillo=dict(ancho=WP, alto=HP, fov=46, escala=1.0, capas=capas_p)),
         vistas=[
             dict(id='sala', nombre='La sala', escena='sala', pos=[0, 0, 0], mira=[W / 2, round((ms['centro'][1] + ms['obra'][1]) / 2 + 10), 0.3], fov=42),
-            dict(id='obra', nombre='La obra', escena='sala', pos=r(pos_obra), mira=[ms['obra'][0], oy, round(nO, 3)], fov=round(fov_obra), libertad=0.6),
+            dict(id='obra', nombre='La obra', escena='sala', pos=r(pos_obra), mira=[ms['obra'][0], oy - 25, round(nO, 3)], fov=round(fov_obra), libertad=0.6),
             dict(id='platillo', nombre='El platillo', escena='platillo', pos=[0, 0.2, -0.1], mira=[round(WP / 2), round(cy), 0.84], fov=46, libertad=0.5),
             dict(id='atril', nombre='Atril', escena='sala', pos=r(pos_atril), mira=[ms['atril'][0], ms['atril'][1] - 40, ms['nAtr']], fov=40),
             dict(id='arco', nombre='Siguiente sala', escena='sala', pos=r(pos_puerta), mira=[pp[0], pp[1], 0.3], fov=40,

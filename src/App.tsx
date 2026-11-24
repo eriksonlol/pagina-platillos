@@ -19,6 +19,7 @@ export default function App() {
   const sala = salas[numero - 1]
   const dentro = useEstado((e) => e.dentro)
   const sonando = useEstado((e) => e.audio.reproduciendo)
+  const audioActivo = useEstado((e) => e.audio.activo)
   useRecorridoGuiado(sala)
   const velo = useRef<HTMLDivElement>(null)
   const alFundido = useCallback((o: number) => {
@@ -47,7 +48,7 @@ export default function App() {
   }, [dentro, sonando])
 
   return (
-    <div className={`museo ${dentro ? 'museo--dentro' : ''}`}>
+    <div className={`museo ${dentro ? 'museo--dentro' : ''} ${audioActivo ? 'museo--audio' : ''}`}>
       <Canvas className="lienzo" dpr={[1, 2]} flat linear gl={{ antialias: true }} camera={{ fov: 42, near: 0.05, far: 60 }}>
         <Suspense fallback={null}>
           <Escena key={sala.numero} sala={sala} alFundido={alFundido} />

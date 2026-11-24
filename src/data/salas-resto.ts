@@ -58,10 +58,10 @@ export const salasResto: Sala[] = [
             "src": "salas/02/sala-pedestal.webp",
             "prof": "salas/02/sala-pedestal-prof.png",
             "caja": [
-              0.4026,
-              0.6471,
-              0.5967,
-              0.8906
+              0.4023,
+              0.6517,
+              0.5974,
+              0.8913
             ],
             "malla": [
               140,
@@ -149,7 +149,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           690,
-          505,
+          480,
           0.537
         ],
         "fov": 38,
@@ -395,10 +395,10 @@ export const salasResto: Sala[] = [
             "src": "salas/03/sala-pedestal.webp",
             "prof": "salas/03/sala-pedestal-prof.png",
             "caja": [
-              0.4142,
-              0.4414,
-              0.5858,
-              0.7995
+              0.4139,
+              0.4284,
+              0.5865,
+              0.8001
             ],
             "malla": [
               140,
@@ -486,10 +486,10 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           690,
-          380,
+          355,
           0.352
         ],
-        "fov": 26,
+        "fov": 27,
         "libertad": 0.6
       },
       {
@@ -747,10 +747,10 @@ export const salasResto: Sala[] = [
             "src": "salas/04/sala-pedestal.webp",
             "prof": "salas/04/sala-pedestal-prof.png",
             "caja": [
-              0.3263,
+              0.3259,
               0.3984,
-              0.6744,
-              0.9193
+              0.6751,
+              0.9206
             ],
             "malla": [
               140,
@@ -843,7 +843,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           690,
-          425,
+          400,
           0.869
         ],
         "fov": 46,
@@ -1083,10 +1083,10 @@ export const salasResto: Sala[] = [
             "src": "salas/05/sala-pedestal.webp",
             "prof": "salas/05/sala-pedestal-prof.png",
             "caja": [
-              0.3663,
-              0.5938,
-              0.6337,
-              0.8776
+              0.3659,
+              0.5931,
+              0.6344,
+              0.8789
             ],
             "malla": [
               140,
@@ -1160,7 +1160,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           690,
-          480,
+          455,
           0.537
         ],
         "fov": 38,
@@ -1416,10 +1416,10 @@ export const salasResto: Sala[] = [
             "src": "salas/06/sala-pedestal.webp",
             "prof": "salas/06/sala-pedestal-prof.png",
             "caja": [
-              0.3241,
-              0.6211,
-              0.6715,
-              0.9062
+              0.3238,
+              0.6009,
+              0.6751,
+              0.9076
             ],
             "malla": [
               140,
@@ -1507,7 +1507,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           700,
-          505,
+          480,
           0.851
         ],
         "fov": 46,
@@ -1772,9 +1772,9 @@ export const salasResto: Sala[] = [
             "src": "salas/07/sala-pedestal.webp",
             "prof": "salas/07/sala-pedestal-prof.png",
             "caja": [
-              0.3358,
-              0.5846,
-              0.6657,
+              0.3354,
+              0.5866,
+              0.6664,
               1.0
             ],
             "malla": [
@@ -1863,7 +1863,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           690,
-          520,
+          495,
           0.778
         ],
         "fov": 46,
@@ -2118,9 +2118,9 @@ export const salasResto: Sala[] = [
             "prof": "salas/08/sala-pedestal-prof.png",
             "caja": [
               0.319,
-              0.4844,
-              0.6802,
-              0.8151
+              0.5736,
+              0.6806,
+              0.8164
             ],
             "malla": [
               140,
@@ -2208,7 +2208,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           688,
-          430,
+          405,
           0.732
         ],
         "fov": 46,
@@ -2459,10 +2459,10 @@ export const salasResto: Sala[] = [
             "src": "salas/09/sala-pedestal.webp",
             "prof": "salas/09/sala-pedestal-prof.png",
             "caja": [
-              0.3481,
-              0.4544,
-              0.6512,
-              0.7891
+              0.3477,
+              0.5495,
+              0.6519,
+              0.7904
             ],
             "malla": [
               140,
@@ -2550,7 +2550,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           688,
-          490,
+          465,
           0.624
         ],
         "fov": 43,
@@ -2810,10 +2810,10 @@ export const salasResto: Sala[] = [
             "src": "salas/10/sala-pedestal.webp",
             "prof": "salas/10/sala-pedestal-prof.png",
             "caja": [
-              0.2558,
-              0.4089,
-              0.7347,
-              0.8776
+              0.2555,
+              0.4896,
+              0.7355,
+              0.8789
             ],
             "malla": [
               140,
@@ -2906,7 +2906,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           690,
-          395,
+          370,
           0.674
         ],
         "fov": 46,
@@ -3160,10 +3160,10 @@ export const salasResto: Sala[] = [
             "src": "salas/11/sala-pedestal.webp",
             "prof": "salas/11/sala-pedestal-prof.png",
             "caja": [
-              0.314,
-              0.4284,
-              0.6802,
-              0.8776
+              0.3136,
+              0.377,
+              0.681,
+              0.8789
             ],
             "malla": [
               140,
@@ -3251,7 +3251,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           690,
-          390,
+          365,
           0.504
         ],
         "fov": 36,
@@ -3514,10 +3514,10 @@ export const salasResto: Sala[] = [
             "src": "salas/12/sala-pedestal.webp",
             "prof": "salas/12/sala-pedestal-prof.png",
             "caja": [
-              0.3648,
-              0.4844,
-              0.6352,
-              0.9258
+              0.3645,
+              0.526,
+              0.6359,
+              0.9271
             ],
             "malla": [
               140,
@@ -3605,7 +3605,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           680,
-          445,
+          420,
           0.602
         ],
         "fov": 42,

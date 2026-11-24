@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import type { P3, Sala } from '../data/salas'
 import { camara, mundo } from '../scene/Escena'
-import { setEstado, useEstado } from '../lib/store'
+import { getEstado, setEstado, useEstado } from '../lib/store'
 import { reproducirGuiado } from '../lib/recorrido'
 import { irASala } from '../lib/navegacion'
 
@@ -32,6 +32,8 @@ export function Capa3D({ sala }: { sala: Sala }) {
       const cam = camara.obj
       if (cam) {
         const movil = camara.ancho < 700
+        // con la audioguía abierta, los subtítulos ocupan la franja inferior
+        const piso = camara.alto - (getEstado().audio.activo ? 230 : 90)
         for (const a of anclas.current.values()) {
           const e = sala.escenas[a.escena]
           mundo(e, a.en, tmp).project(cam)
@@ -40,7 +42,7 @@ export function Capa3D({ sala }: { sala: Sala }) {
           const enVista = !a.vista || a.vista === v.current
           const fijo = a.modo === 'fijo' || (movil && a.modo !== 'punto')
           const ver = a.escena === camara.escena && enVista && !camara.enTransito && tmp.z < 1 &&
-            (fijo || (x > -40 && x < camara.ancho + 40 && y > 70 && y < camara.alto - 90))
+            (fijo || (x > -40 && x < camara.ancho + 40 && y > 70 && y < piso))
           a.el.classList.toggle('visible', ver)
           if (fijo) {
             a.el.style.transform = ''

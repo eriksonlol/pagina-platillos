@@ -68,10 +68,17 @@ guardar_prof(d,'sala-fondo-prof.png',1)
 
 # pedestal: tapar lo que el atril oculta con pixeles del propio pedestal
 ped_rgb=rellenar(rgb,ma*(mp>0.5))
-guardar_rgba(ped_rgb,mp,'sala-pedestal.webp')
+# el platillo de la sala se sustituye por el de la vista de cerca (ver componer.py)
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from componer import componer
+plato=np.array(Image.open(OUT+'platillo-plato.webp').convert('RGBA'))
+rgb2,a2,sa=componer(1,ped_rgb,mp,plato)
+guardar_rgba(rgb2,a2,'sala-pedestal.webp')
+ys_,xs_=np.where(a2>0.02); print('caja pedestal', [round(xs_.min()/a2.shape[1],3),round(ys_.min()/a2.shape[0],3),round(xs_.max()/a2.shape[1],3),round(ys_.max()/a2.shape[0],3)])
+chico=cv2.resize(rgb2,(W,H),interpolation=cv2.INTER_AREA)
 dp=0.72+0.07*np.clip((y-450)/225,0,1)+0.03*np.clip(1-((x-683)/175)**2,0,1)
-dp+= (lum(rgb)-0.3)*0.05
-dp+= 0.03*np.exp(-(((x-700)/60)**2+((y-425)/22)**2))  # la carne sobresale
+dp+= (lum(chico)-0.3)*0.05
+dp+= 0.03*cv2.GaussianBlur(sa,(0,0),4)
 guardar_prof(dp,'sala-pedestal-prof.png',2)
 
 guardar_rgba(rgb,ma,'sala-atril.webp')

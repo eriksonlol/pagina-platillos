@@ -5,6 +5,8 @@
 import json, os, sys
 import numpy as np, cv2
 from PIL import Image, ImageDraw, ImageFilter
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from componer import componer
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ORIGEN = '/mnt/project-files'
@@ -150,11 +152,9 @@ def procesar(n, sp, salida):
     yb_ped = max(q[1] for q in sp['ped'][0])
     n_ped = n_suelo(yb_ped) - 0.03
     ped_rgb = rellenar(rgb, ma * (mp > 0.5), donante=None)
-    guardar_rgba(ped_rgb, mp, f'{salida}/sala-pedestal.webp')
     xs = [q[0] for q in todos]
     pcx, prx = (min(xs) + max(xs)) / 2, (max(xs) - min(xs)) / 2
-    dp = n_ped + 0.03 * np.clip(1 - ((x - pcx) / prx) ** 2, 0, 1) + (lum(rgb) - 0.3) * 0.04
-    guardar_prof(dp, f'{salida}/sala-pedestal-prof.png', 2)
+    ped_x, ped_mp = x.copy(), mp.copy()
     yb_atr = max(q[1] for q in sp['atr'])
     n_atr = n_suelo(yb_atr) - 0.02
     guardar_rgba(rgb, ma, f'{salida}/sala-atril.webp')
@@ -197,6 +197,17 @@ def procesar(n, sp, salida):
         dpl = 0.70 + 0.22 * np.clip((y - yt) / max(yb - yt, 1), 0, 1) + 0.08 * bulto + (lum(rgb) - 0.3) * 0.05
         guardar_prof(dpl, f'{salida}/platillo-plato-prof.png', 2)
         med['platillo'] = dict(ancho=W, alto=H, capas=2, caja=caja(todos, W, H), yt=yt, yb=yb)
+    # el platillo de la sala se sustituye por el de la vista de cerca
+    plato = np.array(Image.open(f'{salida}/platillo-plato.webp' if not pl.get('cenital') else f'{salida}/platillo-fondo.webp').convert('RGBA'))
+    rgb2, a2, sa = componer(n, ped_rgb, ped_mp, plato, pl.get('cenital', False))
+    guardar_rgba(rgb2, a2, f'{salida}/sala-pedestal.webp')
+    ys_, xs_ = np.where(a2 > 0.02)
+    H2, W2 = a2.shape
+    med['sala']['cajaPed'] = [round(max(0, xs_.min() - 8) / W2, 4), round(max(0, ys_.min() - 8) / H2, 4),
+                              round(min(W2, xs_.max() + 8) / W2, 4), round(min(H2, ys_.max() + 8) / H2, 4)]
+    chico = cv2.resize(rgb2, (ped_mp.shape[1], ped_mp.shape[0]), interpolation=cv2.INTER_AREA)
+    dp = n_ped + 0.03 * np.clip(1 - ((ped_x - pcx) / prx) ** 2, 0, 1) + (lum(chico) - 0.3) * 0.04 + 0.03 * cv2.GaussianBlur(sa, (0, 0), 4)
+    guardar_prof(dp, f'{salida}/sala-pedestal-prof.png', 2)
     med['platillo']['elementos'] = [dict(x=e[0], y=e[1], texto=e[2]) for e in pl['el']]
     med['platillo']['centro'] = [fx, fy]
     return med
