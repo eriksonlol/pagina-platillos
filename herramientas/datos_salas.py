@@ -77,6 +77,8 @@ INGR = {
  12: ['Columna miniatura de tuile y crema montada inspirada en Carême', 'Pescado blanco con beurre blanc', 'Tres verduras torneadas', 'Aceite de hierbas'],
 }
 
+PUERTA_TOP = {2: 262, 3: 190, 4: 165, 5: 245, 6: 205, 7: 248, 8: 95, 9: 210, 10: 200, 11: 196, 12: 165}
+
 NOTA_PUERTA = 'Cruza para pasar a la Sala {n}, {nom}.'
 FOV, ESC = 50, 3.2
 
@@ -117,7 +119,10 @@ def sala(n):
     margen = round(170 * 3.71 / ((dist / D) / math.tan(math.radians(fov_obra / 2))))
     A = mundo(W, H, [ms['atril'][0], ms['atril'][1], ms['nAtr']])
     pos_atril = [A[0] * 0.4, 0.1, A[2] * 0.4]
-    pp = ms['puerta']
+    pp = list(ms['puerta'])
+    # si el punto de la puerta queda pegado al de la obra, se sube al dintel
+    if abs(pp[0] - ms['obra'][0]) < 120 and abs(pp[1] - (ms['obra'][1] - 45)) < 150:
+        pp[1] = round(PUERTA_TOP[n] + 30)
     P = mundo(W, H, [pp[0], pp[1], 0.3])
     pos_puerta = [P[0] * 0.22, 0, P[2] * 0.22]
     sig = n + 1 if n < 12 else 1

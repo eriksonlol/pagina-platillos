@@ -199,7 +199,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           689,
-          361,
+          292,
           0.3
         ],
         "fov": 40,
@@ -235,7 +235,7 @@ export const salasResto: Sala[] = [
         "escena": "sala",
         "en": [
           689,
-          361,
+          292,
           0.3
         ],
         "etiqueta": "Sala 3 · Egipto",
@@ -536,7 +536,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           688,
-          325,
+          220,
           0.3
         ],
         "fov": 40,
@@ -572,7 +572,7 @@ export const salasResto: Sala[] = [
         "escena": "sala",
         "en": [
           688,
-          325,
+          220,
           0.3
         ],
         "etiqueta": "Sala 4 · China antigua",
@@ -893,7 +893,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           690,
-          238,
+          195,
           0.3
         ],
         "fov": 40,
@@ -929,7 +929,7 @@ export const salasResto: Sala[] = [
         "escena": "sala",
         "en": [
           690,
-          238,
+          195,
           0.3
         ],
         "etiqueta": "Sala 5 · Los hebreos",
@@ -2600,7 +2600,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           680,
-          296,
+          240,
           0.3
         ],
         "fov": 40,
@@ -2636,7 +2636,7 @@ export const salasResto: Sala[] = [
         "escena": "sala",
         "en": [
           680,
-          296,
+          240,
           0.3
         ],
         "etiqueta": "Sala 10 · Mesoamérica",
@@ -3295,13 +3295,13 @@ export const salasResto: Sala[] = [
         "nombre": "Siguiente sala",
         "escena": "sala",
         "pos": [
-          0.03,
+          0.71,
           0,
           -2.1
         ],
         "mira": [
-          698,
-          318,
+          968,
+          313,
           0.3
         ],
         "fov": 40,
@@ -3336,8 +3336,8 @@ export const salasResto: Sala[] = [
         "id": "arco",
         "escena": "sala",
         "en": [
-          698,
-          318,
+          968,
+          313,
           0.3
         ],
         "etiqueta": "Sala 12 · Edad Moderna",
@@ -3655,7 +3655,7 @@ export const salasResto: Sala[] = [
         ],
         "mira": [
           685,
-          265,
+          195,
           0.3
         ],
         "fov": 40,
@@ -3691,7 +3691,7 @@ export const salasResto: Sala[] = [
         "escena": "sala",
         "en": [
           685,
-          265,
+          195,
           0.3
         ],
         "etiqueta": "Volver a la Sala 1",

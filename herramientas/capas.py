@@ -72,7 +72,7 @@ SALAS = {
            obra=(690,395), humo=(650,330),
            plt=dict(horizonte=340, plato=[(165,560),(180,470),(250,400),(320,330),(450,290),(600,262),(700,255),(860,260),(1000,275),(1120,310),(1190,370),(1230,450),(1235,540),(1215,600),(1100,660),(900,710),(600,720),(380,700),(220,660),(170,620)], foco=(680,430,200,120),
                     el=[(520,500,'Tortilla de maíz azul'),(690,410,'Mole negro'),(820,470,'Espuma de cacao'),(692,585,'Flor de calabaza'),(960,470,'Polvo de chapulín')])),
-  11: dict(back=(300,40,1100,530), puerta=[(640,245),(755,245),(755,455),(640,455)],
+  11: dict(back=(300,40,1100,530), puerta=[(902,196),(1034,196),(1034,530),(902,530)],
            ped=[[(500,405),(555,385),(560,345),(600,335),(650,350),(700,355),(740,350),(800,355),(830,385),(872,400),(860,425),(835,440),(930,462),(925,490),(918,500),(918,668),(452,668),(452,500),(438,470),(500,440)]],
            atr=[(960,412),(1050,408),(1078,465),(1035,470),(1028,475),(1028,600),(1065,660),(985,672),(1005,605),(1008,478),(965,470)],
            obra=(690,390),
@@ -93,7 +93,7 @@ def mascara(polys, W, H, pluma=1.2):
         d.polygon([tuple(map(float, q)) for q in p], fill=255)
     return np.array(m.filter(ImageFilter.GaussianBlur(pluma))).astype(np.float32) / 255
 
-def rellenar(rgb, hueco, donante=(0, -400)):
+def rellenar(rgb, hueco, donante=None):
     h = (hueco > 0.02).astype(np.uint8) * 255
     h = cv2.dilate(h, np.ones((9, 9), np.uint8))
     small = cv2.resize(rgb, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_AREA)
@@ -106,6 +106,10 @@ def rellenar(rgb, hueco, donante=(0, -400)):
         f = rgb.astype(np.float32)
         det = np.roll(f - cv2.GaussianBlur(f, (0, 0), 6), donante, axis=(0, 1))
         out[h > 0] += det[h > 0] * 0.9
+    else:
+        # grano fino para que el relleno no se vea plástico (sin copiar objetos de otra zona)
+        ruido = cv2.GaussianBlur(np.random.default_rng(7).normal(0, 3.2, rgb.shape[:2]).astype(np.float32), (0, 0), 0.7)
+        out[h > 0] += ruido[h > 0][:, None]
     return np.clip(out, 0, 255).astype(np.uint8)
 
 def lum(rgb):

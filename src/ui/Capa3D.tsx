@@ -14,6 +14,7 @@ type Ancla = { el: HTMLElement; escena: string; en: P3; vista?: string; modo: 'p
 
 export function Capa3D({ sala }: { sala: Sala }) {
   const anclas = useRef<Map<string, Ancla>>(new Map())
+  const sobre = useRef(false)
   const vista = useEstado((e) => e.vista)
   const panel = useEstado((e) => e.panel)
   const resaltado = useEstado((e) => e.resaltado)
@@ -28,8 +29,15 @@ export function Capa3D({ sala }: { sala: Sala }) {
   useEffect(() => {
     let id = 0
     const tmp = new THREE.Vector3()
+    // posición del cursor: cerca de un punto de luz la cámara deja de seguirlo
+    const cursor = { x: -1e4, y: -1e4 }
+    const mover = (e: PointerEvent) => {
+      if (e.pointerType === 'mouse') (cursor.x = e.clientX), (cursor.y = e.clientY)
+    }
+    window.addEventListener('pointermove', mover)
     const bucle = () => {
       const cam = camara.obj
+      let cerca = false
       if (cam) {
         const movil = camara.ancho < 700
         // con la audioguía abierta, los subtítulos ocupan la franja inferior
@@ -49,23 +57,35 @@ export function Capa3D({ sala }: { sala: Sala }) {
             continue
           }
           const giro = camara.mouse.x * -7
+          if (ver && a.el.classList.contains('punto-luz') && Math.hypot(cursor.x - x, cursor.y - y) < 90) cerca = true
           if (a.modo === 'punto') a.el.style.transform = `translate3d(${x}px, ${y}px, 0)`
           else if (a.modo === 'izq') a.el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(calc(-100% - 2.4rem), -50%) perspective(900px) rotateY(${12 + giro}deg)`
           else if (a.modo === 'der') a.el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(2.4rem, -50%) perspective(900px) rotateY(${-12 + giro}deg)`
           else a.el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(2.4rem, -50%) perspective(900px) rotateY(${-12 + giro}deg)`
         }
       }
+      camara.quieta = cerca || sobre.current
       id = requestAnimationFrame(bucle)
     }
     bucle()
-    return () => cancelAnimationFrame(id)
+    return () => {
+      cancelAnimationFrame(id)
+      window.removeEventListener('pointermove', mover)
+    }
   }, [sala])
 
-  const inclinar = (en: P3 | null, escena = 'sala') => () => {
-    camara.inclina = en ? mundo(sala.escenas[escena], en) : null
+  // al salir del punto se espera un momento antes de soltar la mirada: si la cámara
+  // mueve el punto fuera del cursor mientras se inclina, no rebota
+  const soltar = useRef<number | undefined>(undefined)
+  const inclinar = (en: P3 | null) => () => {
+    clearTimeout(soltar.current)
+    // con el cursor sobre un punto la cámara se queda quieta, para que el punto no se escape
+    if (en) sobre.current = true
+    else soltar.current = window.setTimeout(() => (sobre.current = false), 350)
   }
   const ir = (vista: string) => {
-    camara.inclina = null
+    clearTimeout(soltar.current)
+    sobre.current = false
     setEstado({ vista, guiado: false })
   }
 
@@ -79,10 +99,11 @@ export function Capa3D({ sala }: { sala: Sala }) {
           key={pt.id}
           ref={reg('p-' + pt.id, { escena: pt.escena, en: pt.en, modo: 'punto', vista: pt.vista === vista ? '__nunca' : undefined })}
           className="punto-luz"
-          onPointerEnter={inclinar(pt.en, pt.escena)}
+          onPointerEnter={inclinar(pt.en)}
           onPointerLeave={inclinar(null)}
           onClick={() => {
-            inclinar(null)()
+            clearTimeout(soltar.current)
+            sobre.current = false
             if (pt.accion === 'audio') reproducirGuiado(sala)
             else if (pt.accion === 'sala') irASala(pt.sala!)
             else ir(pt.vista!)

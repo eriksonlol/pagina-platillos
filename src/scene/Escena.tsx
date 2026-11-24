@@ -25,7 +25,8 @@ export const camara = {
   ancho: 1,
   alto: 1,
   mouse: new THREE.Vector2(),
-  inclina: null as THREE.Vector3 | null, // punto hacia el que se inclina la mirada (hover)
+  inclina: null as THREE.Vector3 | null, // punto hacia el que se inclina la mirada (recorrido guiado)
+  quieta: false, // el cursor está sobre un punto: la cámara deja de seguirlo
 }
 
 const vert = /* glsl */ `
@@ -306,7 +307,7 @@ export function Escena({ sala, alFundido }: { sala: Sala; alFundido: (o: number)
     const lib = s.desde.lib + (s.hasta.lib - s.desde.lib) * k
 
     // el cursor guía la mirada: la cámara se desliza y gira hacia donde apunta
-    s.mouseSuave.lerp(s.mouse, 1 - Math.exp(-dt * 2.2))
+    if (!camara.quieta) s.mouseSuave.lerp(s.mouse, 1 - Math.exp(-dt * 2.2))
     const m = s.mouseSuave
     const e = sala.escenas[s.escena]
     const asp = size.width / size.height
@@ -333,15 +334,15 @@ export function Escena({ sala, alFundido }: { sala: Sala; alFundido: (o: number)
     if (camara.inclina) s.inclina.lerp(camara.inclina, 0.2)
     s.peso += ((camara.inclina ? 1 : 0) - s.peso) * (1 - Math.exp(-dt * 3))
     if (s.peso > 0.001) {
-      miraFinal.lerp(s.inclina, 0.28 * s.peso)
-      pos.lerp(s.inclina, 0.06 * s.peso)
+      miraFinal.lerp(s.inclina, 0.16 * s.peso)
+      pos.lerp(s.inclina, 0.025 * s.peso)
     }
 
     s.actual.pos.copy(pos)
     s.actual.mira.copy(mira)
     s.actual.fov = fovBase
     cam.position.copy(pos)
-    cam.fov = fov * (1 - 0.06 * s.peso)
+    cam.fov = fov * (1 - 0.04 * s.peso)
     cam.near = 0.05
     cam.far = 60
     cam.updateProjectionMatrix()
