@@ -39,3 +39,9 @@ npm run build    # genera dist/ para publicar (Vercel o Netlify)
   (escriben `public/salas/NN/` y `src/data/salas-resto.ts`). Se puede abrir una sala directo con `#sala-N`.
 - Las capas, tomas, puntos de luz y paneles se definen en `salas.ts` con coordenadas en píxeles
   del render y su cercanía (0 lejos, 1 cerca).
+
+## Publicación
+
+El sitio se publica solo en GitHub Pages con `.github/workflows/publicar.yml` cada vez que se sube
+un cambio. Solo hay que activarlo una vez en **Settings → Pages → Source: GitHub Actions**.
+Dirección: https://eriksonlol.github.io/pagina-platillos/
